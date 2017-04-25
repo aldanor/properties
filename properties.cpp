@@ -30,7 +30,7 @@ struct tag {
 };
 
 template<typename T>
-struct writer_base {
+struct object {
     template<typename P, typename V, typename = std::enable_if_t<is_property<P>>>
     T& set(const V& value) noexcept {
         P::set_property(static_cast<T&>(*this), value);
@@ -53,21 +53,23 @@ struct writer_base {
     }
 };
 
+// -----------------------------------------------------------------------------------------------
+
 struct p1 : public property<p1, bool, false> {};
 struct p2 : public property<p2, int, 42> {};
 
-class writer :
-    public writer_base<writer>,
+class test :
+    public object<test>,
     public p1
 {};
 
 int main() {
-    writer foo;
-    std::cout << foo.get<p1>() << std::endl;
-    foo.set<p1>(true); std::cout << foo.get<p1>() << std::endl;
-    foo.set<p1>(false); std::cout << foo.get<p1>() << std::endl;
-    foo.set<p1>(true); std::cout << foo.get<p1>() << std::endl;
-    std::cout << foo.get<p2>() << std::endl;
-    std::cout << foo.has<p1>() << std::endl;
-    std::cout << foo.has<p2>() << std::endl;
+    test x;
+    std::cout << x.get<p1>() << std::endl;
+    x.set<p1>(true); std::cout << x.get<p1>() << std::endl;
+    x.set<p1>(false); std::cout << x.get<p1>() << std::endl;
+    x.set<p1>(true); std::cout << x.get<p1>() << std::endl;
+    std::cout << x.get<p2>() << std::endl;
+    std::cout << x.has<p1>() << std::endl;
+    std::cout << x.has<p2>() << std::endl;
 }
