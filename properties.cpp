@@ -14,11 +14,14 @@ class test
 
 int main() {
     test x;
-    std::cout << x.get<p1>() << std::endl;
-    x.set<p1>(true); std::cout << x.get<p1>() << std::endl;
-    x.set<p1>(false); std::cout << x.get<p1>() << std::endl;
-    x.set<p1>(true); std::cout << x.get<p1>() << std::endl;
-    std::cout << x.get<p2>() << std::endl;
-    std::cout << x.has<p1>() << std::endl;
-    std::cout << x.has<p2>() << std::endl;
+    std::cout << std::boolalpha;
+    std::cout << "get(p1): " << x.get<p1>() << std::endl;
+    x.set<p1>(true); std::cout << "get(p1): " << x.get<p1>() << std::endl;
+    x.set<p1>(false); std::cout << "get(p1): " << x.get<p1>() << std::endl;
+    x.set<p1>(true); std::cout << "get(p1): " << x.get<p1>() << std::endl;
+    std::cout << "get(p2): " << x.get<p2>() << std::endl;
+    std::cout << "get(p1): " << x.has<p1>() << std::endl;
+    std::cout << "has(p2): " << x.has<p2>() << std::endl;
+    std::cout << "get_or(p1, false): " << x.get_or<p1>(false) << std::endl;
+    std::cout << "get_or(p2, 43): " << x.get_or<p2>(43) << std::endl;
 }
