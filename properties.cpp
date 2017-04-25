@@ -7,9 +7,9 @@ using namespace properties;
 struct p1 : public property<p1, bool, false> {};
 struct p2 : public property<p2, int, 42> {};
 
-class test :
-    public object<test>,
-    public with_property<p1>
+class test
+    : public object<test>,
+      public with_property<p1>
 {};
 
 int main() {
