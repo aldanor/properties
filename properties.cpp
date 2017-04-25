@@ -3,30 +3,52 @@
 
 struct property_base {};
 
+template<typename P>
+constexpr bool is_property = std::is_base_of<property_base, P>{};
+
+template<typename>
+class with_property;
+
+template<typename T, typename P>
+constexpr bool has_property = std::is_base_of<with_property<P>, T>{};
+
 template<typename P, typename V, V value>
-class property : public property_base {
-public:
+struct property : public property_base {
+    using value_type = V;
+
     constexpr property() = default;
 
     template<typename T>
     static constexpr V get_property(const T& obj) noexcept {
-        return static_cast<const P&>(obj).value_;
+        return static_cast<const with_property<P>&>(obj)();
     }
 
     template<typename T>
     static void set_property(T& obj, V v) noexcept {
-        static_cast<P&>(obj).value_ = v;
+        static_cast<with_property<P>&>(obj)() = v;
     }
 
+private:
     V value_ = value;
+
+    friend with_property<P>;
 };
 
 template<typename P>
-constexpr bool is_property = std::is_base_of<property_base, P>{};
+class with_property {
+private:
+    template<typename, typename V, V value>
+    friend struct property;
 
-template<typename P>
-struct tag {
-    using type = P;
+    typename P::value_type& operator()() {
+        return property_.value_;
+    }
+
+    constexpr const typename P::value_type& operator()() const {
+        return property_.value_;
+    }
+
+    P property_ = {};
 };
 
 template<typename T>
@@ -37,19 +59,19 @@ struct object {
         return static_cast<T&>(*this);
     }
 
-    template<typename P, std::enable_if_t<std::is_base_of<P, T>{} && is_property<P>>* = nullptr>
+    template<typename P, std::enable_if_t<is_property<P> && has_property<T, P>>* = nullptr>
     auto get() const noexcept {
         return P::get_property(static_cast<const T&>(*this));
     }
 
-    template<typename P, std::enable_if_t<!std::is_base_of<P, T>{} && is_property<P>>* = nullptr>
+    template<typename P, std::enable_if_t<is_property<P> && !has_property<T, P>>* = nullptr>
     constexpr auto get() const noexcept {
-        return P::get_property(P{});
+        return P::get_property(with_property<P>{});
     }
 
     template<typename P>
     constexpr bool has() const noexcept {
-        return std::is_base_of<P, T>{};
+        return has_property<T, P>;
     }
 };
 
@@ -60,7 +82,7 @@ struct p2 : public property<p2, int, 42> {};
 
 class test :
     public object<test>,
-    public p1
+    public with_property<p1>
 {};
 
 int main() {
