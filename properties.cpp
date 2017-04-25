@@ -2,6 +2,8 @@
 
 #include "include/properties.h"
 
+using namespace properties;
+
 struct p1 : public property<p1, bool, false> {};
 struct p2 : public property<p2, int, 42> {};
 

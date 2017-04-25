@@ -3,6 +3,8 @@
 
 #include <type_traits>
 
+namespace properties {
+
 struct property_base {};
 
 template<typename P>
@@ -76,5 +78,7 @@ struct object {
         return has_property<T, P>;
     }
 };
+
+}  // namespace properties
 
 #endif  // PROPERTIES_H_
