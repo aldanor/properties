@@ -73,7 +73,7 @@ struct object {
         return P::get_property(with_property<P>{});
     }
 
-    template<typename P>
+    template<typename P, typename = std::enable_if_t<is_property<P>>>
     constexpr bool has() const noexcept {
         return has_property<T, P>;
     }
