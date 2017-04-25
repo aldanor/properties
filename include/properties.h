@@ -73,6 +73,16 @@ struct object {
         return P::get_property(with_property<P>{});
     }
 
+    template<typename P, std::enable_if_t<is_property<P> && has_property<T, P>>* = nullptr>
+    auto get_or(typename P::value_type value) const noexcept {
+        return get<P>();
+    }
+
+    template<typename P, std::enable_if_t<is_property<P> && !has_property<T, P>>* = nullptr>
+    constexpr auto get_or(typename P::value_type value) const noexcept {
+        return value;
+    }
+
     template<typename P, typename = std::enable_if_t<is_property<P>>>
     constexpr bool has() const noexcept {
         return has_property<T, P>;
