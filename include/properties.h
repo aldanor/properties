@@ -59,6 +59,21 @@ private:
     friend with_property<P>;
 };
 
+template<typename T>
+void set(T& /* obj */)
+{}
+
+template<typename T, typename P>
+void set(T& obj, P&& p) {
+    P::set(obj, std::forward<P>(p));
+}
+
+template<typename T, typename P, typename... Ps>
+void set(T& obj, P&& p, Ps&&... ps) {
+    set(obj, std::forward<P>(p));
+    set(obj, std::forward<Ps>(ps)...);
+}
+
 template<typename P>
 class with_property {
     template<typename, typename V, V value>
