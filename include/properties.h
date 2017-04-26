@@ -77,8 +77,6 @@ void set(T& obj, P&& p, Ps&&... ps) {
 
 template<typename P>
 struct getter {
-    static_assert(is_property<P>, "");
-
     template<typename T>
     constexpr auto operator()(const T& obj) const {
         return P::get(obj);
@@ -93,7 +91,7 @@ struct static_const {
 template<typename T>
 constexpr T static_const<T>::value;
 
-template<typename P>
+template<typename P, typename = std::enable_if_t<is_property<P>>>
 constexpr auto& get = static_const<getter<P>>::value;
 
 template<typename P>
