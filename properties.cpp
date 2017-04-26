@@ -53,4 +53,7 @@ int main() {
     set(b, p1{true}, p2{142});
     std::cout << p1::get(b) << std::endl;
     std::cout << p2::get(b) << std::endl;
+
+    std::cout << get<p1>(b) << std::endl;
+    std::cout << get<p2>(b) << std::endl;
 }
