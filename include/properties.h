@@ -61,7 +61,6 @@ private:
 
 template<typename P>
 class with_property {
-private:
     template<typename, typename V, V value>
     friend struct property;
 
