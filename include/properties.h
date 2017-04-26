@@ -23,12 +23,27 @@ struct property : public property_base {
     constexpr property() = default;
 
     template<typename T>
-    static constexpr V get_property(const T& obj) noexcept {
+    static bool has(T&& /* object */) noexcept {
+        return has_property<T, P>;
+    }
+
+    template<typename T, std::enable_if_t<has_property<T, P>>* = nullptr>
+    static constexpr V get(const T& obj) noexcept {
         return static_cast<const with_property<P>&>(obj)();
     }
 
+    template<typename T, std::enable_if_t<!has_property<T, P>>* = nullptr>
+    static constexpr V get(const T& obj) noexcept {
+        return P{};
+    }
+
     template<typename T>
-    static void set_property(T& obj, V v) noexcept {
+    static constexpr V get_or(const T& obj, V v) noexcept {
+        return has(obj) ? get(obj) : v;
+    }
+
+    template<typename T>
+    static void set(T& obj, V v) noexcept {
         static_cast<with_property<P>&>(obj)() = v;
     }
 
@@ -59,28 +74,18 @@ template<typename T>
 struct object {
     template<typename P, typename V, typename = std::enable_if_t<is_property<P>>>
     T& set(const V& value) noexcept {
-        P::set_property(static_cast<T&>(*this), value);
+        P::set(static_cast<T&>(*this), value);
         return static_cast<T&>(*this);
     }
 
-    template<typename P, std::enable_if_t<is_property<P> && has_property<T, P>>* = nullptr>
-    auto get() const noexcept {
-        return P::get_property(static_cast<const T&>(*this));
-    }
-
-    template<typename P, std::enable_if_t<is_property<P> && !has_property<T, P>>* = nullptr>
+    template<typename P, typename = std::enable_if_t<is_property<P>>>
     constexpr auto get() const noexcept {
-        return P::get_property(with_property<P>{});
+        return P::get(static_cast<const T&>(*this));
     }
 
-    template<typename P, std::enable_if_t<is_property<P> && has_property<T, P>>* = nullptr>
-    auto get_or(typename P::value_type value) const noexcept {
-        return get<P>();
-    }
-
-    template<typename P, std::enable_if_t<is_property<P> && !has_property<T, P>>* = nullptr>
+    template<typename P, typename = std::enable_if_t<is_property<P>>>
     constexpr auto get_or(typename P::value_type value) const noexcept {
-        return value;
+        return P::get_or(static_cast<const T&>(*this), value);
     }
 
     template<typename P, typename = std::enable_if_t<is_property<P>>>
