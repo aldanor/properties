@@ -65,6 +65,7 @@ void set(T& /* obj */)
 
 template<typename T, typename P>
 void set(T& obj, P&& p) {
+    static_assert(has_property<T, P>, "");
     P::set(obj, std::forward<P>(p));
 }
 
