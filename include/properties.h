@@ -76,6 +76,27 @@ void set(T& obj, P&& p, Ps&&... ps) {
 }
 
 template<typename P>
+struct getter {
+    static_assert(is_property<P>, "");
+
+    template<typename T>
+    constexpr auto operator()(const T& obj) const {
+        return P::get(obj);
+    }
+};
+
+template<typename T>
+struct static_const {
+    constexpr static T value = {};
+};
+
+template<typename T>
+constexpr T static_const<T>::value;
+
+template<typename P>
+constexpr auto& get = static_const<getter<P>>::value;
+
+template<typename P>
 class with_property {
     template<typename, typename V, V value>
     friend struct property;
