@@ -24,6 +24,10 @@ struct property : public property_base {
 
     constexpr property(V v) : value_(v) {}
 
+    constexpr operator V() const {
+        return value_;
+    }
+
     template<typename T>
     static bool has(T&& /* object */) noexcept {
         return has_property<T, P>;
